@@ -1,0 +1,119 @@
+{
+  "id": "301Source0001Routing",
+  "name": "Lead_Routing",
+  "type": "Flow",
+  "label": "Lead Routing",
+  "processType": "AutoLaunchedFlow",
+  "triggerType": "RecordBeforeSave",
+  "triggerObjectType": "Lead",
+  "status": "Active",
+  "description": "Routes incoming leads to the correct sales rep based on score and region",
+  "elements": [
+    {
+      "type": "recordLookup",
+      "name": "Get_Lead_Score",
+      "object": "Lead",
+      "filters": [
+        {
+          "field": "Lead.CustomScore__c",
+          "operator": "GreaterThan",
+          "value": "0"
+        }
+      ],
+      "outputVariable": "leadScore"
+    },
+    {
+      "type": "decision",
+      "name": "Check_Score_Threshold",
+      "rules": [
+        {
+          "name": "High_Score",
+          "conditions": [
+            {
+              "field": "Lead.CustomScore__c",
+              "operator": "GreaterThanOrEqualTo",
+              "value": "80"
+            }
+          ]
+        },
+        {
+          "name": "Low_Score",
+          "conditions": [
+            {
+              "field": "Lead.CustomScore__c",
+              "operator": "LessThan",
+              "value": "80"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "subflow",
+      "name": "Calculate_Lead_Score",
+      "referencedFlow": "Lead_Scoring",
+      "inputAssignments": [
+        {
+          "name": "leadId",
+          "value": "{!$Record.Id}"
+        }
+      ],
+      "outputAssignments": [
+        {
+          "name": "leadScore",
+          "value": "{!Calculate_Lead_Score.score}"
+        }
+      ]
+    },
+    {
+      "type": "recordUpdate",
+      "name": "Assign_To_Sales_Rep",
+      "object": "Lead",
+      "updates": [
+        {
+          "field": "Lead.CustomScore__c",
+          "value": "{!leadScore}"
+        },
+        {
+          "field": "Lead.OwnerId",
+          "value": "005Source0001ABC"
+        },
+        {
+          "field": "Lead.Status",
+          "value": "Qualified"
+        }
+      ]
+    },
+    {
+      "type": "recordUpdate",
+      "name": "Assign_To_Nurture",
+      "object": "Lead",
+      "updates": [
+        {
+          "field": "Lead.CustomScore__c",
+          "value": "{!leadScore}"
+        },
+        {
+          "field": "Lead.Status",
+          "value": "Nurturing"
+        }
+      ]
+    }
+  ],
+  "variables": [
+    {
+      "name": "leadScore",
+      "dataType": "Number",
+      "isInput": false,
+      "isOutput": false,
+      "defaultValue": null
+    },
+    {
+      "name": "routingOwnerId",
+      "dataType": "String",
+      "isInput": false,
+      "isOutput": false,
+      "defaultValue": "005Source0001ABC"
+    }
+  ]
+}

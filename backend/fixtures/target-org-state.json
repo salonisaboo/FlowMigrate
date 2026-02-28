@@ -1,0 +1,21 @@
+{
+  "_comment": "This represents what already exists in the target platform instance. When deploying, if an asset has the same 'name' as one listed here, skip creation and use the existing target ID instead.",
+  "assets": [
+    {
+      "id": "301Target0002ScoringXYZ",
+      "name": "Lead_Scoring",
+      "type": "Flow",
+      "label": "Lead Scoring",
+      "status": "Active"
+    }
+  ],
+  "userMappingHints": {
+    "_comment": "These are NOT provided to candidates automatically — the user must provide these in the UI. This file is here for evaluation purposes only.",
+    "005Source0001ABC": "005Target0099XYZ"
+  },
+  "fieldMappingHints": {
+    "_comment": "These are NOT provided automatically. The user must map these in the UI.",
+    "Lead.CustomScore__c": "Lead.Score__c",
+    "Opportunity.CloseReasonDetail__c": "Opportunity.CloseReason__c"
+  }
+}

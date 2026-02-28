@@ -1,0 +1,119 @@
+{
+  "id": "301Source0002Scoring",
+  "name": "Lead_Scoring",
+  "type": "Flow",
+  "label": "Lead Scoring",
+  "processType": "AutoLaunchedFlow",
+  "triggerType": "RecordAfterSave",
+  "triggerObjectType": "Lead",
+  "status": "Active",
+  "description": "Calculates a lead score based on title, company size, and engagement. Called as a sub-flow by Lead_Routing.",
+  "elements": [
+    {
+      "type": "assignment",
+      "name": "Set_Base_Score",
+      "assignments": [
+        {
+          "field": "{!score}",
+          "operator": "Assign",
+          "value": "50"
+        }
+      ]
+    },
+    {
+      "type": "decision",
+      "name": "Check_Title",
+      "rules": [
+        {
+          "name": "Is_Director_Or_VP",
+          "conditions": [
+            {
+              "field": "Lead.Title",
+              "operator": "Contains",
+              "value": "Director"
+            }
+          ]
+        },
+        {
+          "name": "Is_Manager",
+          "conditions": [
+            {
+              "field": "Lead.Title",
+              "operator": "Contains",
+              "value": "Manager"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "assignment",
+      "name": "Add_Title_Score",
+      "assignments": [
+        {
+          "field": "{!score}",
+          "operator": "Add",
+          "value": "20"
+        }
+      ]
+    },
+    {
+      "type": "decision",
+      "name": "Check_Company_Size",
+      "rules": [
+        {
+          "name": "Large_Company",
+          "conditions": [
+            {
+              "field": "Lead.NumberOfEmployees",
+              "operator": "GreaterThan",
+              "value": "500"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "assignment",
+      "name": "Add_Company_Score",
+      "assignments": [
+        {
+          "field": "{!score}",
+          "operator": "Add",
+          "value": "15"
+        }
+      ]
+    },
+    {
+      "type": "recordUpdate",
+      "name": "Update_Lead_Score",
+      "object": "Lead",
+      "updates": [
+        {
+          "field": "Lead.LeadScore",
+          "value": "{!score}"
+        },
+        {
+          "field": "Lead.LastModifiedDate",
+          "value": "{!$Flow.CurrentDateTime}"
+        }
+      ]
+    }
+  ],
+  "variables": [
+    {
+      "name": "leadId",
+      "dataType": "String",
+      "isInput": true,
+      "isOutput": false,
+      "defaultValue": null
+    },
+    {
+      "name": "score",
+      "dataType": "Number",
+      "isInput": false,
+      "isOutput": true,
+      "defaultValue": "0"
+    }
+  ]
+}

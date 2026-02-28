@@ -1,0 +1,99 @@
+{
+  "id": "301Source0003OppClose",
+  "name": "Opp_Close_Actions",
+  "type": "Flow",
+  "label": "Opportunity Close Actions",
+  "processType": "AutoLaunchedFlow",
+  "triggerType": "RecordBeforeSave",
+  "triggerObjectType": "Opportunity",
+  "status": "Active",
+  "description": "Runs when an Opportunity is Closed Won. Records close details, reassigns ownership, and creates follow-up tasks.",
+  "elements": [
+    {
+      "type": "decision",
+      "name": "Is_Closed_Won",
+      "rules": [
+        {
+          "name": "Stage_Is_Closed_Won",
+          "conditions": [
+            {
+              "field": "Opportunity.StageName",
+              "operator": "EqualTo",
+              "value": "Closed Won"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recordUpdate",
+      "name": "Record_Close_Details",
+      "object": "Opportunity",
+      "updates": [
+        {
+          "field": "Opportunity.CloseReasonDetail__c",
+          "value": "{!$Record.Description}"
+        },
+        {
+          "field": "Opportunity.OwnerId",
+          "value": "005Source0001ABC"
+        },
+        {
+          "field": "Opportunity.CloseDate",
+          "value": "{!$Flow.CurrentDate}"
+        }
+      ]
+    },
+    {
+      "type": "createRecord",
+      "name": "Create_Contract_Task",
+      "object": "Task",
+      "fields": [
+        {
+          "field": "Task.Subject",
+          "value": "Send signed contract to client"
+        },
+        {
+          "field": "Task.OwnerId",
+          "value": "005Source0001ABC"
+        },
+        {
+          "field": "Task.WhatId",
+          "value": "{!$Record.Id}"
+        },
+        {
+          "field": "Task.ActivityDate",
+          "value": "{!$Flow.CurrentDate}"
+        },
+        {
+          "field": "Task.Status",
+          "value": "Not Started"
+        }
+      ]
+    },
+    {
+      "type": "createRecord",
+      "name": "Create_Kickoff_Task",
+      "object": "Task",
+      "fields": [
+        {
+          "field": "Task.Subject",
+          "value": "Schedule customer kickoff call"
+        },
+        {
+          "field": "Task.OwnerId",
+          "value": "005Source0001ABC"
+        },
+        {
+          "field": "Task.WhatId",
+          "value": "{!$Record.Id}"
+        },
+        {
+          "field": "Task.Status",
+          "value": "Not Started"
+        }
+      ]
+    }
+  ],
+  "variables": []
+}
