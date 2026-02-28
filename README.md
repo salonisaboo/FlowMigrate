@@ -136,6 +136,15 @@ The backend and frontend run as separate applications.
 git clone <repository-url>
 cd FlowMigrate
 ```
+## Optional Improvement
+
+Currently, the backend and frontend must be started separately.
+
+With additional setup, this could be simplified to a single root-level command such as:
+
+npm install && npm run dev
+
+This could be implemented using concurrently or a root-level script to start both services together.
 
 ---
 
@@ -245,6 +254,13 @@ The parser uses recursive traversal over the Flow JSON object.
 Instead of relying on fixed positions, it walks through the entire object tree and analyzes keys and values to detect dependency patterns.
 
 This makes the parser flexible and resilient to structural differences in Flow metadata.
+
+---
+## Tradeoffs
+
+The system prioritizes simplicity over full Salesforce API integration.  
+It uses rule-based dependency detection instead of schema-based validation.  
+An in-memory store is used instead of a database to keep the prototype lightweight.
 
 ---
 
